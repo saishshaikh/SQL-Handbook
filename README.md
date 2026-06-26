@@ -792,3 +792,263 @@ Each new row gets the next available integer value in `id`.
 | DEFAULT        | Sets a default value                   |
 | PRIMARY KEY    | Uniquely identifies each row           |
 | AUTO_INCREMENT | Automatically generates sequential IDs |
+
+
+
+
+# SQL Functions (MySQL)
+
+SQL functions help you analyze, transform, or summarize data in your tables.
+
+We’ll use the **`users`** table which includes:
+
+- `id`
+- `name`
+- `email`
+- `gender`
+- `date_of_birth`
+- `salary`
+- `created_at`
+
+---
+
+# 1. Aggregate Functions
+
+These return a single value from a set of rows.
+
+## `COUNT()`
+
+Count total number of users:
+
+```sql
+SELECT COUNT(*) FROM users;
+```
+
+Count users who are Female:
+
+```sql
+SELECT COUNT(*) FROM users WHERE gender = 'Female';
+```
+
+---
+
+## `MIN()` and `MAX()`
+
+Get the minimum and maximum salary:
+
+```sql
+SELECT MIN(salary) AS min_salary,
+       MAX(salary) AS max_salary
+FROM users;
+```
+
+---
+
+## `SUM()`
+
+Calculate total salary payout:
+
+```sql
+SELECT SUM(salary) AS total_payroll
+FROM users;
+```
+
+---
+
+## `AVG()`
+
+Find average salary:
+
+```sql
+SELECT AVG(salary) AS avg_salary
+FROM users;
+```
+
+---
+
+## Grouping with `GROUP BY`
+
+Average salary by gender:
+
+```sql
+SELECT gender,
+       AVG(salary) AS avg_salary
+FROM users
+GROUP BY gender;
+```
+
+---
+
+# 2. String Functions
+
+## `LENGTH()`
+
+Length of user names:
+
+```sql
+SELECT name,
+       LENGTH(name) AS name_length
+FROM users;
+```
+
+---
+
+## `LOWER()` and `UPPER()`
+
+Convert names to lowercase:
+
+```sql
+SELECT name,
+       LOWER(name) AS lowercase_name
+FROM users;
+```
+
+Convert names to uppercase:
+
+```sql
+SELECT name,
+       UPPER(name) AS uppercase_name
+FROM users;
+```
+
+---
+
+## `CONCAT()`
+
+Combine name and email:
+
+```sql
+SELECT CONCAT(name, ' <', email, '>') AS user_contact
+FROM users;
+```
+
+---
+
+# 3. Date Functions
+
+## `NOW()`
+
+Current date and time:
+
+```sql
+SELECT NOW();
+```
+
+---
+
+## `YEAR()`, `MONTH()`, `DAY()`
+
+Extract parts of `date_of_birth`.
+
+### Birth Year
+
+```sql
+SELECT name,
+       YEAR(date_of_birth) AS birth_year
+FROM users;
+```
+
+### Birth Month
+
+```sql
+SELECT name,
+       MONTH(date_of_birth) AS birth_month
+FROM users;
+```
+
+### Birth Day
+
+```sql
+SELECT name,
+       DAY(date_of_birth) AS birth_day
+FROM users;
+```
+
+---
+
+## `DATEDIFF()`
+
+Find number of days between today and birthdate:
+
+```sql
+SELECT name,
+       DATEDIFF(CURDATE(), date_of_birth) AS days_lived
+FROM users;
+```
+
+---
+
+## `TIMESTAMPDIFF()`
+
+Calculate age in years:
+
+```sql
+SELECT name,
+       TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) AS age
+FROM users;
+```
+
+---
+
+# 4. Mathematical Functions
+
+## `ROUND()`, `FLOOR()`, `CEIL()`
+
+```sql
+SELECT salary,
+       ROUND(salary) AS rounded,
+       FLOOR(salary) AS floored,
+       CEIL(salary) AS ceiled
+FROM users;
+```
+
+---
+
+## `MOD()`
+
+Find even or odd user IDs:
+
+```sql
+SELECT id,
+       MOD(id, 2) AS remainder
+FROM users;
+```
+
+---
+
+# 5. Conditional Functions
+
+## `IF()`
+
+```sql
+SELECT name,
+       gender,
+       IF(gender = 'Female', 'Yes', 'No') AS is_female
+FROM users;
+```
+
+---
+
+# Summary Table
+
+| Function | Purpose |
+|----------|---------|
+| `COUNT()` | Count rows |
+| `SUM()` | Total of a column |
+| `AVG()` | Average of values |
+| `MIN()` / `MAX()` | Lowest / Highest value |
+| `LENGTH()` | String length |
+| `LOWER()` | Convert text to lowercase |
+| `UPPER()` | Convert text to uppercase |
+| `CONCAT()` | Merge strings |
+| `NOW()` | Current date and time |
+| `YEAR()` | Extract year from a date |
+| `MONTH()` | Extract month from a date |
+| `DAY()` | Extract day from a date |
+| `DATEDIFF()` | Difference between two dates (days) |
+| `TIMESTAMPDIFF()` | Difference between dates in a specified unit |
+| `ROUND()` | Round a number |
+| `FLOOR()` | Round down |
+| `CEIL()` | Round up |
+| `MOD()` | Find remainder |
+| `IF()` | Conditional logic |
