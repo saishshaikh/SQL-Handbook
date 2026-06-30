@@ -1341,4 +1341,1594 @@ CREATE TABLE addresses(
 
 ---
 
+# SQL JOINs in MySQL
+
+## What is a JOIN?
+
+A **JOIN** is used to combine rows from **two or more tables** based on a related column.
+
+Generally, the relationship is created using:
+
+- **Primary Key (PK)** in one table
+- **Foreign Key (FK)** in another table
+
+---
+
+# Sample Tables
+
+## users
+
+| id | name |
+|----|-------|
+| 1 | Aarav |
+| 2 | Sneha |
+| 3 | Raj |
+
+---
+
+## addresses
+
+| id | user_id | city |
+|----|---------|---------|
+| 1 | 1 | Mumbai |
+| 2 | 2 | Kolkata |
+| 3 | 4 | Delhi |
+
+> **Note:** `user_id` is a Foreign Key that references `users.id`.
+
+---
+
+# 1. INNER JOIN
+
+### Definition
+
+Returns **only the matching rows** from both tables.
+
+### Query
+
+```sql
+SELECT users.name,
+       addresses.city
+FROM users
+INNER JOIN addresses
+ON users.id = addresses.user_id;
+```
+
+### Output
+
+| name | city |
+|------|---------|
+| Aarav | Mumbai |
+| Sneha | Kolkata |
+
+### Explanation
+
+- Aarav → user_id = 1 ✅
+- Sneha → user_id = 2 ✅
+- Raj → No matching address ❌
+- Delhi → user_id = 4 doesn't exist in `users` ❌
+
+Only matching records are returned.
+
+### Visual Representation
+
+```
+users               addresses
+
+1 ------------- 1
+2 ------------- 2
+3
+
+Result:
+✔ Aarav - Mumbai
+✔ Sneha - Kolkata
+```
+
+---
+
+# 2. LEFT JOIN
+
+### Definition
+
+Returns:
+
+- **All rows from the LEFT table**
+- Matching rows from the RIGHT table
+- If no match exists, NULL is returned.
+
+### Query
+
+```sql
+SELECT users.name,
+       addresses.city
+FROM users
+LEFT JOIN addresses
+ON users.id = addresses.user_id;
+```
+
+### Output
+
+| name | city |
+|------|---------|
+| Aarav | Mumbai |
+| Sneha | Kolkata |
+| Raj | NULL |
+
+### Explanation
+
+- Aarav → Match found ✅
+- Sneha → Match found ✅
+- Raj → No address → NULL
+
+Every user appears.
+
+### Visual Representation
+
+```
+users               addresses
+
+1 ------------- 1
+2 ------------- 2
+3
+
+Result:
+✔ Aarav - Mumbai
+✔ Sneha - Kolkata
+✔ Raj - NULL
+```
+
+---
+
+# 3. RIGHT JOIN
+
+### Definition
+
+Returns:
+
+- **All rows from the RIGHT table**
+- Matching rows from the LEFT table
+- If no match exists, NULL is returned.
+
+### Query
+
+```sql
+SELECT users.name,
+       addresses.city
+FROM users
+RIGHT JOIN addresses
+ON users.id = addresses.user_id;
+```
+
+### Output
+
+| name | city |
+|------|---------|
+| Aarav | Mumbai |
+| Sneha | Kolkata |
+| NULL | Delhi |
+
+### Explanation
+
+- Mumbai → Match found ✅
+- Kolkata → Match found ✅
+- Delhi → user_id = 4 doesn't exist → NULL
+
+Every address appears.
+
+### Visual Representation
+
+```
+users               addresses
+
+1 ------------- 1
+2 ------------- 2
+                4
+
+Result:
+✔ Aarav - Mumbai
+✔ Sneha - Kolkata
+✔ NULL - Delhi
+```
+
+---
+
+# INNER JOIN vs LEFT JOIN vs RIGHT JOIN
+
+| JOIN | Returns |
+|-------|----------|
+| INNER JOIN | Only matching rows from both tables |
+| LEFT JOIN | All rows from the left table + matching rows from the right table |
+| RIGHT JOIN | All rows from the right table + matching rows from the left table |
+
+---
+
+# Quick Interview Revision
+
+### INNER JOIN
+
+✅ Only matching records.
+
+```
+users ∩ addresses
+```
+
+---
+
+### LEFT JOIN
+
+✅ Everything from the left table.
+
+```
+users
++
+matched addresses
+```
+
+Missing values become **NULL**.
+
+---
+
+### RIGHT JOIN
+
+✅ Everything from the right table.
+
+```
+addresses
++
+matched users
+```
+
+Missing values become **NULL**.
+
+---
+
+# Interview Tip
+
+A simple way to remember:
+
+- **INNER JOIN** → Only common records.
+- **LEFT JOIN** → Keep everything from the **left** table.
+- **RIGHT JOIN** → Keep everything from the **right** table.
+
+---
+
+# Summary
+
+| JOIN Type | Includes Left Table | Includes Right Table | Unmatched Rows |
+|------------|--------------------|----------------------|----------------|
+| INNER JOIN | Only matched | Only matched | No |
+| LEFT JOIN | All rows | Only matched | NULL on right |
+| RIGHT JOIN | Only matched | All rows | NULL on left |
+
+---
+
+
+
+# SQL UNION, UNION ALL & SELF JOIN (MySQL)
+
+---
+
+# 1. UNION
+
+## Definition
+
+The `UNION` operator combines the result of **two or more SELECT statements** into a single result set.
+
+✅ **Duplicate rows are removed automatically.**
+
+---
+
+## Syntax
+
+```sql
+SELECT column_name
+FROM table1
+
+UNION
+
+SELECT column_name
+FROM table2;
+```
+
+---
+
+# Example Tables
+
+## users
+
+| id | name |
+|----|------|
+| 1 | Aarav |
+| 2 | Sneha |
+| 3 | Raj |
+| 4 | Pooja |
+
+---
+
+## admin_users
+
+| id | name |
+|----|--------------|
+| 101 | Anil Kumar |
+| 102 | Pooja |
+| 103 | Rakesh |
+| 104 | Fatima |
+
+---
+
+# Example 1 — UNION
+
+```sql
+SELECT name
+FROM users
+
+UNION
+
+SELECT name
+FROM admin_users;
+```
+
+### Output
+
+| name |
+|------|
+| Aarav |
+| Sneha |
+| Raj |
+| Pooja |
+| Anil Kumar |
+| Rakesh |
+| Fatima |
+
+> If **Pooja** exists in both tables, it appears **only once** because `UNION` removes duplicates.
+
+---
+
+# 2. UNION ALL
+
+## Definition
+
+`UNION ALL` combines results from multiple `SELECT` statements **without removing duplicates**.
+
+It is faster than `UNION` because SQL does not check for duplicate rows.
+
+---
+
+## Syntax
+
+```sql
+SELECT column_name
+FROM table1
+
+UNION ALL
+
+SELECT column_name
+FROM table2;
+```
+
+---
+
+## Example
+
+```sql
+SELECT name
+FROM users
+
+UNION ALL
+
+SELECT name
+FROM admin_users;
+```
+
+### Output
+
+| name |
+|------|
+| Aarav |
+| Sneha |
+| Raj |
+| Pooja |
+| Anil Kumar |
+| Pooja |
+| Rakesh |
+| Fatima |
+
+> Here **Pooja** appears **twice** because `UNION ALL` keeps duplicates.
+
+---
+
+# UNION with Multiple Columns
+
+Both `SELECT` statements must return:
+
+- Same number of columns
+- Same order of columns
+- Compatible data types
+
+```sql
+SELECT name, salary
+FROM users
+
+UNION
+
+SELECT name, salary
+FROM admin_users;
+```
+
+---
+
+# Adding Custom Values
+
+```sql
+SELECT name,
+       'User' AS role
+FROM users
+
+UNION
+
+SELECT name,
+       'Admin' AS role
+FROM admin_users;
+```
+
+### Output
+
+| name | role |
+|------|-------|
+| Aarav | User |
+| Sneha | User |
+| Raj | User |
+| Anil Kumar | Admin |
+| Pooja | Admin |
+
+---
+
+# ORDER BY with UNION
+
+```sql
+SELECT name
+FROM users
+
+UNION
+
+SELECT name
+FROM admin_users
+
+ORDER BY name;
+```
+
+---
+
+# Rules of UNION
+
+- Both queries must return the **same number of columns**.
+- Column data types must be compatible.
+- `UNION` removes duplicates.
+- `UNION ALL` keeps duplicates.
+- `ORDER BY` is written only once, at the end of the final query.
+
+---
+
+# UNION vs UNION ALL
+
+| UNION | UNION ALL |
+|--------|-----------|
+| Removes duplicate rows | Keeps duplicate rows |
+| Slower | Faster |
+| Performs duplicate checking | No duplicate checking |
+
+---
+
+# When to Use UNION
+
+- Combining data from two similar tables.
+- Current and archived records.
+- Reports from multiple tables.
+- Combining filtered results.
+
+---
+
+# Interview Question
+
+### Difference between UNION and UNION ALL?
+
+**UNION**
+- Removes duplicate rows.
+- Slower because duplicate checking is performed.
+
+**UNION ALL**
+- Keeps duplicate rows.
+- Faster because no duplicate checking is performed.
+
+---
+
+# 3. SELF JOIN
+
+## Definition
+
+A **SELF JOIN** joins a table with itself.
+
+It is useful when rows within the same table are related.
+
+Examples:
+
+- Employee → Manager
+- Customer → Referrer
+- Parent → Child
+
+---
+
+# Example Table
+
+## users
+
+| id | name | referred_by_id |
+|----|------|----------------|
+| 1 | Aarav | NULL |
+| 2 | Sneha | 1 |
+| 3 | Raj | 1 |
+| 4 | Fatima | 2 |
+
+---
+
+# SELF JOIN Query
+
+```sql
+SELECT
+    a.id,
+    a.name AS user_name,
+    b.name AS referred_by
+FROM users a
+LEFT JOIN users b
+ON a.referred_by_id = b.id;
+```
+
+---
+
+# Output
+
+| id | user_name | referred_by |
+|----|-----------|-------------|
+| 1 | Aarav | NULL |
+| 2 | Sneha | Aarav |
+| 3 | Raj | Aarav |
+| 4 | Fatima | Sneha |
+
+---
+
+# Explanation
+
+`a`
+
+- Represents the current user.
+
+`b`
+
+- Represents the person who referred that user.
+
+The table is joined with itself using:
+
+```sql
+a.referred_by_id = b.id
+```
+
+---
+
+# Why LEFT JOIN?
+
+We use `LEFT JOIN` so users who were **not referred** are also displayed.
+
+Example:
+
+```
+Aarav → NULL
+```
+
+If `INNER JOIN` were used, Aarav would not appear because `referred_by_id` is `NULL`.
+
+---
+
+# Visual Representation
+
+```
+users
+
+id   name      referred_by_id
+
+1    Aarav     NULL
+2    Sneha     1
+3    Raj       1
+4    Fatima    2
+
+
+SELF JOIN
+
+Sneha  ----------> Aarav
+
+Raj     ----------> Aarav
+
+Fatima ----------> Sneha
+```
+
+---
+
+# SELF JOIN vs INNER JOIN
+
+| INNER JOIN | SELF JOIN |
+|------------|-----------|
+| Joins two different tables | Joins the same table |
+| Uses PK–FK between tables | Uses relationship within the same table |
+| Example: Employee & Department | Example: Employee & Manager |
+
+---
+
+# Quick Revision
+
+## UNION
+
+- Combines result sets.
+- Removes duplicates.
+
+---
+
+## UNION ALL
+
+- Combines result sets.
+- Keeps duplicates.
+- Faster.
+
+---
+
+## SELF JOIN
+
+- Joins a table with itself.
+- Uses aliases (`a`, `b`) to distinguish the two references.
+- Commonly used for employee-manager or referral relationships.
+
+---
+# MySQL Views, Indexes & Subqueries
+
+---
+
+# MySQL Views
+
+## What is a View?
+
+A **View** is a virtual table created from the result of a `SELECT` query.
+
+Unlike a normal table, a view **does not store data physically**. It always displays the latest data from the underlying table.
+
+### Why Use Views?
+
+- Simplify complex SQL queries.
+- Reuse frequently used queries.
+- Hide sensitive columns from users.
+- Display filtered data.
+- Create a live snapshot of data.
+
+---
+
+## Create a View
+
+Suppose we want to display users whose salary is greater than ₹70,000.
+
+```sql
+CREATE VIEW high_salary_users AS
+SELECT id, name, salary
+FROM users
+WHERE salary > 70000;
+```
+
+---
+
+## Query the View
+
+```sql
+SELECT *
+FROM high_salary_users;
+```
+
+### Example Output
+
+| id | name | salary |
+|----|-------|--------|
+| 2 | Sneha | 75000 |
+| 5 | Fatima | 80000 |
+
+---
+
+## Views Always Show Latest Data
+
+### Before Update
+
+```sql
+SELECT * FROM high_salary_users;
+```
+
+| id | name | salary |
+|----|-------|--------|
+| 2 | Sneha | 75000 |
+| 5 | Fatima | 80000 |
+
+---
+
+### Update Base Table
+
+```sql
+UPDATE users
+SET salary = 72000
+WHERE name = 'Raj';
+```
+
+---
+
+### Query View Again
+
+```sql
+SELECT * FROM high_salary_users;
+```
+
+### New Output
+
+| id | name | salary |
+|----|-------|--------|
+| 2 | Sneha | 75000 |
+| 3 | Raj | 72000 |
+| 5 | Fatima | 80000 |
+
+Raj appears automatically because a **View always reflects the latest data** from the original table.
+
+---
+
+## Drop a View
+
+```sql
+DROP VIEW high_salary_users;
+```
+
+---
+
+## Advantages of Views
+
+- Acts like a saved `SELECT` query.
+- Always shows updated data.
+- Improves security by hiding columns.
+- Makes queries easier to read.
+
+---
+
+## Interview Question
+
+**Q. What is a View?**
+
+**Answer:**
+
+A View is a virtual table created using a `SELECT` statement. It does not store data physically and always displays the latest data from the underlying table.
+
+---
+
+# MySQL Indexes
+
+## What is an Index?
+
+An **Index** is a database object that improves the speed of retrieving records.
+
+Think of it like the index of a book—it helps MySQL find data quickly.
+
+---
+
+## View Existing Indexes
+
+```sql
+SHOW INDEXES FROM users;
+```
+
+This displays all indexes created on the `users` table, including the Primary Key index.
+
+---
+
+## Create a Single-Column Index
+
+```sql
+CREATE INDEX idx_email
+ON users(email);
+```
+
+### Example
+
+```sql
+SELECT *
+FROM users
+WHERE email = 'example@example.com';
+```
+
+Searching by `email` becomes much faster.
+
+---
+
+## Create a Multi-Column Index
+
+```sql
+CREATE INDEX idx_gender_salary
+ON users(gender, salary);
+```
+
+### Example
+
+```sql
+SELECT *
+FROM users
+WHERE gender = 'Female'
+AND salary > 70000;
+```
+
+This query can efficiently use the combined index.
+
+---
+
+## Index Order Matters
+
+For an index on:
+
+```sql
+(gender, salary)
+```
+
+✅ Efficient
+
+```sql
+WHERE gender = 'Female'
+AND salary > 70000;
+```
+
+❌ Less Efficient
+
+```sql
+WHERE salary > 70000;
+```
+
+Because the first indexed column (`gender`) is not used.
+
+---
+
+## Drop an Index
+
+```sql
+DROP INDEX idx_email
+ON users;
+```
+
+---
+
+## Advantages of Indexes
+
+- Faster searching.
+- Faster filtering.
+- Faster joins.
+- Faster sorting.
+
+---
+
+## Disadvantages of Indexes
+
+- Uses additional disk space.
+- Slows down `INSERT`, `UPDATE`, and `DELETE`.
+- Should be created only on frequently searched columns.
+
+---
+
+## Interview Question
+
+**Q. What is an Index?**
+
+**Answer:**
+
+An Index is a database object that speeds up data retrieval by creating a lookup structure for one or more columns.
+
+---
+
+# MySQL Subqueries
+
+## What is a Subquery?
+
+A **Subquery** is a query written inside another SQL query.
+
+It helps solve complex problems by breaking them into smaller queries.
+
+---
+
+## Where Can Subqueries Be Used?
+
+- `SELECT`
+- `WHERE`
+- `FROM`
+
+---
+
+# Scalar Subquery
+
+A scalar subquery returns **only one value**.
+
+### Example
+
+```sql
+SELECT id,
+       name,
+       salary
+FROM users
+WHERE salary >
+(
+    SELECT AVG(salary)
+    FROM users
+);
+```
+
+### Explanation
+
+Inner Query:
+
+```sql
+SELECT AVG(salary)
+FROM users;
+```
+
+Returns the average salary.
+
+Outer Query:
+
+Returns employees earning more than the average salary.
+
+---
+
+# Subquery with IN
+
+```sql
+SELECT id,
+       name,
+       referred_by_id
+FROM users
+WHERE referred_by_id IN
+(
+    SELECT id
+    FROM users
+    WHERE salary > 75000
+);
+```
+
+### Explanation
+
+The inner query returns IDs of users earning more than ₹75,000.
+
+The outer query returns users referred by those users.
+
+---
+
+# Subquery in SELECT
+
+```sql
+SELECT name,
+       salary,
+(
+    SELECT AVG(salary)
+    FROM users
+) AS average_salary
+FROM users;
+```
+
+### Example Output
+
+| name | salary | average_salary |
+|-------|--------|----------------|
+| Aarav | 60000 | 65000 |
+| Sneha | 75000 | 65000 |
+| Raj | 72000 | 65000 |
+
+---
+
+# Subquery in FROM
+
+```sql
+SELECT *
+FROM
+(
+    SELECT dept_id,
+           AVG(salary) AS avg_salary
+    FROM users
+    GROUP BY dept_id
+) AS department_average;
+```
+
+The subquery acts like a temporary table.
+
+---
+
+# Types of Subqueries
+
+| Type | Description |
+|------|-------------|
+| Scalar Subquery | Returns a single value |
+| IN Subquery | Returns multiple values |
+| Subquery in SELECT | Returns calculated values |
+| Subquery in FROM | Acts as a temporary table |
+
+---
+
+# GROUP BY and HAVING in MySQL
+
+The `GROUP BY` clause is used to group rows that have the same values in one or more columns. It is commonly used with aggregate functions such as `COUNT()`, `SUM()`, `AVG()`, `MIN()`, and `MAX()`.
+
+The `HAVING` clause is used to filter grouped data after aggregation, similar to how `WHERE` filters individual rows before grouping.
+
+---
+
+# Example Table: `users`
+
+| id | name   | gender | salary | referred_by_id |
+| -- | ------ | ------ | ------ | -------------- |
+| 1  | Aarav  | Male   | 80000  | NULL           |
+| 2  | Sneha  | Female | 75000  | 1              |
+| 3  | Raj    | Male   | 72000  | 1              |
+| 4  | Fatima | Female | 85000  | 2              |
+| 5  | Priya  | Female | 70000  | NULL           |
+
+---
+
+# GROUP BY Example – Average Salary by Gender
+
+```sql
+SELECT gender, AVG(salary) AS average_salary
+FROM users
+GROUP BY gender;
+```
+
+### Explanation
+
+* Groups users based on the `gender` column.
+* Calculates the average salary for each gender.
+
+---
+
+# GROUP BY with COUNT()
+
+Find how many users were referred by each user.
+
+```sql
+SELECT referred_by_id, COUNT(*) AS total_referred
+FROM users
+WHERE referred_by_id IS NOT NULL
+GROUP BY referred_by_id;
+```
+
+### Output
+
+| referred_by_id | total_referred |
+| -------------- | -------------- |
+| 1              | 2              |
+| 2              | 1              |
+
+---
+
+# HAVING Clause
+
+Suppose we want to display only those genders whose average salary is greater than ₹75,000.
+
+```sql
+SELECT gender, AVG(salary) AS avg_salary
+FROM users
+GROUP BY gender
+HAVING AVG(salary) > 75000;
+```
+
+### Why HAVING Instead of WHERE?
+
+* `WHERE` filters rows **before** grouping.
+* `HAVING` filters groups **after** `GROUP BY`.
+* Aggregate functions like `AVG()` and `COUNT()` can be used only in `HAVING`.
+
+---
+
+# Another Example
+
+Show users who referred more than one person.
+
+```sql
+SELECT referred_by_id, COUNT(*) AS total_referred
+FROM users
+WHERE referred_by_id IS NOT NULL
+GROUP BY referred_by_id
+HAVING COUNT(*) > 1;
+```
+
+---
+
+# GROUP BY with ROLLUP
+
+`ROLLUP` is used to generate subtotals and a grand total.
+
+```sql
+SELECT gender, COUNT(*) AS total_users
+FROM users
+GROUP BY gender WITH ROLLUP;
+```
+
+### Explanation
+
+This query returns:
+
+* Total users for each gender.
+* A final row showing the grand total of all users.
+
+---
+
+# WHERE vs GROUP BY vs HAVING
+
+| Clause   | Purpose                            | Aggregate Functions |
+| -------- | ---------------------------------- | ------------------- |
+| WHERE    | Filters rows before grouping       | ❌ No                |
+| GROUP BY | Groups rows based on column values | N/A                 |
+| HAVING   | Filters groups after aggregation   | ✅ Yes               |
+
+---
+
+#
+---
+
+
+
+# Stored Procedures, Triggers & More in MySQL
+
+---
+
+# Stored Procedures in MySQL
+
+A **Stored Procedure** is a saved SQL program that can be executed whenever needed. It helps you reuse SQL logic such as queries, inserts, updates, deletes, or conditional statements.
+
+---
+
+# Why Change the Delimiter?
+
+By default, MySQL uses `;` to end SQL statements.
+
+Since a stored procedure contains multiple SQL statements ending with `;`, MySQL may think the procedure ends too early.
+
+To avoid this, we temporarily change the delimiter.
+
+Example:
+
+```sql
+DELIMITER $$
+```
+
+After creating the procedure, change it back.
+
+```sql
+DELIMITER ;
+```
+
+---
+
+# Basic Syntax
+
+```sql
+DELIMITER $$
+
+CREATE PROCEDURE procedure_name()
+BEGIN
+    -- SQL statements
+END $$
+
+DELIMITER ;
+```
+
+---
+
+# Stored Procedure with Input Parameters
+
+Suppose we want to insert a new user into the `users` table.
+
+```sql
+DELIMITER $$
+
+CREATE PROCEDURE AddUser(
+    IN p_name VARCHAR(100),
+    IN p_email VARCHAR(100),
+    IN p_gender ENUM('Male','Female','Other'),
+    IN p_dob DATE,
+    IN p_salary INT
+)
+BEGIN
+    INSERT INTO users(name, email, gender, date_of_birth, salary)
+    VALUES(p_name, p_email, p_gender, p_dob, p_salary);
+END $$
+
+DELIMITER ;
+```
+
+---
+
+# Calling the Procedure
+
+```sql
+CALL AddUser(
+    'Kiran Sharma',
+    'kiran@example.com',
+    'Female',
+    '1994-06-15',
+    72000
+);
+```
+
+The procedure inserts a new record into the `users` table.
+
+---
+
+# Important Notes
+
+* `IN` is used for input parameters.
+* Stored procedures are stored inside the database.
+* They can be executed multiple times.
+
+---
+
+# View Stored Procedures
+
+```sql
+SHOW PROCEDURE STATUS
+WHERE Db='startersql';
+```
+
+---
+
+# Drop a Stored Procedure
+
+```sql
+DROP PROCEDURE IF EXISTS AddUser;
+```
+
+---
+
+# Summary
+
+| Command                 | Purpose                                |
+| ----------------------- | -------------------------------------- |
+| `DELIMITER $$`          | Change statement delimiter temporarily |
+| `CREATE PROCEDURE`      | Create a stored procedure              |
+| `CALL procedure_name()` | Execute a procedure                    |
+| `DROP PROCEDURE`        | Delete a procedure                     |
+
+---
+
+# Interview Questions
+
+### What is a Stored Procedure?
+
+A Stored Procedure is a saved SQL program that can be executed multiple times to perform database operations.
+
+### Why do we use DELIMITER?
+
+Because procedures contain multiple SQL statements ending with `;`. Changing the delimiter prevents MySQL from ending the procedure definition too early.
+
+---
+
+# Triggers in MySQL
+
+A **Trigger** is a special stored program that executes automatically whenever a specified event occurs on a table.
+
+Events include:
+
+* INSERT
+* UPDATE
+* DELETE
+
+---
+
+# Why Use Triggers?
+
+* Log database changes.
+* Enforce business rules.
+* Automatically update related tables.
+* Maintain audit records.
+
+---
+
+# Basic Trigger Syntax
+
+```sql
+CREATE TRIGGER trigger_name
+
+AFTER INSERT
+ON table_name
+
+FOR EACH ROW
+
+BEGIN
+    -- SQL statements
+END;
+```
+
+---
+
+# Trigger Types
+
+Triggers can execute:
+
+* BEFORE INSERT
+* AFTER INSERT
+* BEFORE UPDATE
+* AFTER UPDATE
+* BEFORE DELETE
+* AFTER DELETE
+
+---
+
+# Example Scenario
+
+Suppose we want to log every newly inserted user.
+
+---
+
+# Step 1: Create Log Table
+
+```sql
+CREATE TABLE user_log(
+
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    user_id INT,
+
+    name VARCHAR(100),
+
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
+```
+
+---
+
+# Step 2: Create Trigger
+
+```sql
+DELIMITER $$
+
+CREATE TRIGGER after_user_insert
+
+AFTER INSERT
+ON users
+
+FOR EACH ROW
+
+BEGIN
+
+    INSERT INTO user_log(user_id,name)
+
+    VALUES(NEW.id,NEW.name);
+
+END $$
+
+DELIMITER ;
+```
+
+---
+
+# Explanation
+
+* `AFTER INSERT` → Trigger runs after inserting a row.
+* `NEW` → Refers to the newly inserted row.
+* User details are automatically inserted into `user_log`.
+
+---
+
+# Step 3: Test Trigger
+
+```sql
+CALL AddUser(
+'Ritika Jain',
+'ritika@example.com',
+'Female',
+'1996-03-12',
+74000
+);
+```
+
+Now check:
+
+```sql
+SELECT *
+FROM user_log;
+```
+
+Ritika's information will be logged automatically.
+
+---
+
+# Drop Trigger
+
+```sql
+DROP TRIGGER IF EXISTS after_user_insert;
+```
+
+---
+
+# Trigger Summary
+
+| Component    | Description                          |
+| ------------ | ------------------------------------ |
+| BEFORE       | Runs before an event                 |
+| AFTER        | Runs after an event                  |
+| INSERT       | Fires on insert                      |
+| UPDATE       | Fires on update                      |
+| DELETE       | Fires on delete                      |
+| NEW.column   | Refers to new values                 |
+| OLD.column   | Refers to old values                 |
+| FOR EACH ROW | Executes once for every affected row |
+
+---
+
+# More on MySQL
+
+---
+
+# 1. Logical Operators
+
+Logical operators combine multiple conditions.
+
+| Operator | Description                         | Example                            |
+| -------- | ----------------------------------- | ---------------------------------- |
+| AND      | All conditions must be true         | `salary > 50000 AND gender='Male'` |
+| OR       | At least one condition must be true | `gender='Male' OR gender='Other'`  |
+| NOT      | Reverses a condition                | `NOT gender='Female'`              |
+
+---
+
+# 2. Add a New Column
+
+```sql
+ALTER TABLE users
+
+ADD COLUMN city VARCHAR(100);
+```
+
+Adds a new column named `city`.
+
+---
+
+# 3. Wildcard Operators
+
+Used with the `LIKE` operator.
+
+| Wildcard | Meaning                  | Example      |
+| -------- | ------------------------ | ------------ |
+| `%`      | Any number of characters | `LIKE 'A%'`  |
+| `_`      | Exactly one character    | `LIKE '_a%'` |
+
+---
+
+# 4. LIMIT and OFFSET
+
+Return selected rows after skipping some records.
+
+```sql
+SELECT *
+
+FROM users
+
+ORDER BY id
+
+LIMIT 5 OFFSET 10;
+```
+
+Skips the first 10 rows and returns the next 5.
+
+Alternative syntax:
+
+```sql
+SELECT *
+
+FROM users
+
+ORDER BY id
+
+LIMIT 10,5;
+```
+
+---
+
+# 5. DISTINCT
+
+Returns unique values.
+
+```sql
+SELECT DISTINCT gender
+
+FROM users;
+```
+
+---
+
+# 6. TRUNCATE
+
+Removes all rows while keeping the table structure.
+
+```sql
+TRUNCATE TABLE users;
+```
+
+**Advantages**
+
+* Faster than `DELETE`.
+* Keeps table structure.
+* Resets auto-increment (in most databases).
+
+---
+
+# 7. CHANGE vs MODIFY
+
+### CHANGE
+
+Rename a column and change its datatype.
+
+```sql
+ALTER TABLE users
+
+CHANGE COLUMN city location VARCHAR(150);
+```
+
+---
+
+### MODIFY
+
+Only changes the datatype.
+
+```sql
+ALTER TABLE users
+
+MODIFY COLUMN salary BIGINT;
+```
+
+---
+
+# CHANGE vs MODIFY
+
+| CHANGE                        | MODIFY                          |
+| ----------------------------- | ------------------------------- |
+| Rename + datatype change      | Datatype change only            |
+| Column name must be specified | Existing name remains unchanged |
+
+---
+
+# Quick Revision
+
+### Stored Procedure
+
+* Saved SQL block.
+* Reusable.
+* Executed using `CALL`.
+
+### Trigger
+
+* Executes automatically.
+* Fires on INSERT, UPDATE, DELETE.
+* Uses `NEW` and `OLD`.
+
+### DISTINCT
+
+Returns unique values.
+
+### TRUNCATE
+
+Deletes all rows but keeps the table.
+
+### LIMIT OFFSET
+
+Used for pagination.
+
+### CHANGE
+
+Rename column and datatype.
+
+### MODIFY
+
+Only changes datatype.
+
+---
 
