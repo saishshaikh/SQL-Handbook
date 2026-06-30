@@ -1052,3 +1052,293 @@ FROM users;
 | `CEIL()` | Round up |
 | `MOD()` | Find remainder |
 | `IF()` | Conditional logic |
+
+
+
+---
+
+# 🔄 MySQL Transactions & AutoCommit
+
+## What is AutoCommit?
+
+By default, MySQL runs in **AutoCommit Mode**.
+
+That means every SQL statement is treated as a separate transaction and is saved automatically.
+
+If you want complete control over transactions, disable AutoCommit.
+
+---
+
+## Disable AutoCommit
+
+```sql
+SET autocommit = 0;
+```
+
+Now changes are **not permanent** until you execute:
+
+```sql
+COMMIT;
+```
+
+---
+
+## COMMIT
+
+Saves all changes permanently.
+
+```sql
+COMMIT;
+```
+
+Example
+
+```sql
+SET autocommit = 0;
+
+UPDATE users
+SET salary = 80000
+WHERE id = 5;
+
+COMMIT;
+```
+
+---
+
+## ROLLBACK
+
+Cancels all changes after the last COMMIT.
+
+```sql
+ROLLBACK;
+```
+
+Example
+
+```sql
+SET autocommit = 0;
+
+UPDATE users
+SET salary = 80000
+WHERE id = 5;
+
+ROLLBACK;
+```
+
+The salary returns to its previous value.
+
+---
+
+## Enable AutoCommit Again
+
+```sql
+SET autocommit = 1;
+```
+
+---
+
+## Best Practices
+
+- Use **COMMIT** only after verifying your changes.
+- Use **ROLLBACK** when an error occurs.
+- Disable AutoCommit while performing multiple related updates.
+
+---
+
+# 🔑 PRIMARY KEY
+
+A **Primary Key** uniquely identifies every row in a table.
+
+A Primary Key:
+
+- Must be unique
+- Cannot contain NULL values
+- Identifies each row uniquely
+- Can contain one or multiple columns
+- Only one Primary Key is allowed per table
+
+---
+
+## Example
+
+```sql
+CREATE TABLE users(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+);
+```
+
+---
+
+# PRIMARY KEY vs UNIQUE
+
+| Feature | PRIMARY KEY | UNIQUE |
+|----------|-------------|---------|
+| Unique Values | ✅ | ✅ |
+| Allows NULL | ❌ | ✅ |
+| Per Table | Only One | Multiple |
+| Used as Main Identifier | ✅ | ❌ |
+
+---
+
+## UNIQUE Example
+
+```sql
+CREATE TABLE users(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) UNIQUE,
+    name VARCHAR(100)
+);
+```
+
+---
+
+## Drop Primary Key
+
+```sql
+ALTER TABLE users
+DROP PRIMARY KEY;
+```
+
+---
+
+## Drop UNIQUE Constraint
+
+```sql
+ALTER TABLE users
+DROP INDEX email;
+```
+
+---
+
+# AUTO_INCREMENT
+
+Automatically generates sequential values.
+
+```sql
+CREATE TABLE users(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+);
+```
+
+Change starting value
+
+```sql
+ALTER TABLE users
+AUTO_INCREMENT = 1000;
+```
+
+---
+
+## Key Takeaways
+
+- Primary Key uniquely identifies records.
+- UNIQUE prevents duplicate values.
+- AUTO_INCREMENT generates IDs automatically.
+
+---
+
+# 🔗 FOREIGN KEY
+
+A Foreign Key creates a relationship between two tables.
+
+It ensures that values exist in the referenced table.
+
+---
+
+## Example
+
+### Users Table
+
+```sql
+CREATE TABLE users(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+);
+```
+
+### Addresses Table
+
+```sql
+CREATE TABLE addresses(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    street VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    pincode VARCHAR(10),
+
+    FOREIGN KEY(user_id)
+    REFERENCES users(id)
+);
+```
+
+---
+
+## Why Use Foreign Keys?
+
+- Maintains data integrity
+- Prevents invalid references
+- Connects related tables
+
+---
+
+## Add Foreign Key Later
+
+```sql
+ALTER TABLE addresses
+ADD CONSTRAINT fk_user
+FOREIGN KEY(user_id)
+REFERENCES users(id);
+```
+
+---
+
+## Drop Foreign Key
+
+```sql
+ALTER TABLE addresses
+DROP FOREIGN KEY fk_user;
+```
+
+---
+
+# ON DELETE CASCADE
+
+Automatically deletes child records when the parent record is deleted.
+
+```sql
+CREATE TABLE addresses(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    street VARCHAR(255),
+
+    CONSTRAINT fk_user
+    FOREIGN KEY(user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE
+);
+```
+
+---
+
+# Other ON DELETE Options
+
+| Option | Description |
+|---------|-------------|
+| CASCADE | Delete child records automatically |
+| SET NULL | Set Foreign Key to NULL |
+| RESTRICT | Prevent deleting parent record |
+
+---
+
+## Summary
+
+- Foreign Keys maintain relationships.
+- They improve data integrity.
+- Use `ON DELETE CASCADE` when child records should also be deleted automatically.
+
+---
+
+
