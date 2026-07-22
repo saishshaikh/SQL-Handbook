@@ -1,0 +1,339 @@
+-- =====================================================================
+-- SQL COMPLETE PRACTICE SCRIPT (Basic to Advanced)
+-- =====================================================================
+
+
+-- =====================================================================
+-- 1. DDL & DML: DATABASES, TABLES, AND BASIC INSERTS
+-- =====================================================================
+
+CREATE DATABASE saish;
+USE saish;
+
+-- Create initial employees table
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    employee_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    salary DECIMAL(10, 2)  
+);
+
+-- Add a new column to an existing table
+ALTER TABLE employees 
+ADD COLUMN department VARCHAR(40) NOT NULL;
+
+-- Insert sample records into employees
+INSERT INTO employees (employee_id, employee_name, email, salary, department) VALUES
+(1, 'Rahul', 'rahul@gmail.com', 50000.00, 'IT'),
+(2, 'Amit', 'amit@gmail.com', 45000.00, 'HR'),
+(3, 'Sneha', 'sneha@gmail.com', 55000.00, 'Finance'),
+(4, 'Priya', 'priya@gmail.com', 60000.00, 'IT'),
+(5, 'Rohit', 'rohit@gmail.com', 40000.00, 'Sales'),
+(6, 'Neha', 'neha@gmail.com', 52000.00, 'HR'),
+(7, 'Vikas', 'vikas@gmail.com', 48000.00, 'Marketing'),
+(8, 'Pooja', 'pooja@gmail.com', 65000.00, 'Finance'),
+(9, 'Arjun', 'arjun@gmail.com', 70000.00, 'IT'),
+(10, 'Kiran', 'kiran@gmail.com', 43000.00, 'Sales'); 
+
+
+-- =====================================================================
+-- 2. BASIC SELECT, WHERE, LIKE, IN, LIMIT & AGGREGATE FUNCTIONS
+-- =====================================================================
+
+-- 1. View all employees
+SELECT * FROM employees;
+
+-- 2. Filter records using WHERE (Salary > 50000)
+SELECT * FROM employees WHERE salary > 50000;
+
+-- 3. Filter using BETWEEN
+SELECT * FROM employees 
+WHERE salary BETWEEN 50000 AND 80000;
+
+-- 4. Using IN operator (Filter for specific departments)
+SELECT * FROM employees 
+WHERE department IN ('IT', 'HR');
+
+-- 5. Using LIKE operator (Pattern matching - Names starting with 'R')
+SELECT * FROM employees 
+WHERE employee_name LIKE 'R%';
+
+-- 6. Using LIMIT (Get top 5 highest paid employees)
+SELECT * FROM employees 
+ORDER BY salary DESC 
+LIMIT 5;
+
+-- 7. Count total employees
+SELECT COUNT(*) AS total_employees FROM employees;
+
+-- 8. Maximum salary
+SELECT MAX(salary) AS max_salary FROM employees;
+
+-- 9. Minimum salary
+SELECT MIN(salary) AS min_salary FROM employees;
+
+-- 10. Average salary
+SELECT AVG(salary) AS avg_salary FROM employees;
+
+-- 11. Sum of all salaries
+SELECT SUM(salary) AS total_salary FROM employees;
+
+-- 12. Unique departments
+SELECT DISTINCT department FROM employees;
+
+-- 13. Order by salary descending
+SELECT * FROM employees 
+ORDER BY salary DESC;
+
+
+-- =====================================================================
+-- 3. UPDATE & DELETE OPERATIONS
+-- =====================================================================
+
+-- Update record
+UPDATE employees
+SET salary = 60000
+WHERE employee_id = 1;
+
+-- Delete record
+DELETE FROM employees
+WHERE employee_id = 10;
+
+
+-- =====================================================================
+-- 4. GROUP BY, HAVING, & CASE STATEMENT
+-- =====================================================================
+
+-- Department-wise employee count
+SELECT department, COUNT(*) AS count_employee
+FROM employees
+GROUP BY department;
+
+-- Department-wise average salary
+SELECT department, AVG(salary) AS avg_salary
+FROM employees 
+GROUP BY department;
+
+-- Departments with more than 2 employees
+SELECT department, COUNT(*) AS employee_no 
+FROM employees 
+GROUP BY department 
+HAVING COUNT(*) > 2;
+
+-- Department with maximum employees using LIMIT
+SELECT department, COUNT(*) AS total_emp
+FROM employees
+GROUP BY department
+ORDER BY total_emp DESC
+LIMIT 1;
+
+-- Using CASE Statement (Categorize employees based on salary)
+SELECT employee_name, salary,
+       CASE 
+           WHEN salary >= 60000 THEN 'High Salary'
+           WHEN salary BETWEEN 45000 AND 59999 THEN 'Medium Salary'
+           ELSE 'Low Salary'
+       END AS salary_category
+FROM employees;
+
+
+-- =====================================================================
+-- 5. JOIN CONCEPTS (INNER JOIN & LEFT JOIN)
+-- =====================================================================
+
+-- Drop previous table to set up clean schemas for Joins
+DROP TABLE IF EXISTS employees;
+
+-- --- A. Customers & Orders (INNER JOIN) ---
+
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(50),
+    city VARCHAR(50)
+);
+
+INSERT INTO customers VALUES
+(1, 'Rahul', 'Mumbai'),
+(2, 'Priya', 'Pune'),
+(3, 'Amit', 'Delhi'),
+(4, 'Neha', 'Jaipur'),
+(5, 'Arjun', 'Mumbai');
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    product VARCHAR(50)
+);
+
+INSERT INTO orders VALUES
+(101, 1, 'Laptop'),
+(102, 2, 'Mobile'),
+(103, 1, 'Mouse'),
+(104, 3, 'Keyboard'),
+(105, 6, 'Tablet');
+
+-- Q1: Show customer name and ordered product
+SELECT c.customer_name, o.product  
+FROM customers c 
+INNER JOIN orders o ON c.customer_id = o.customer_id;
+
+-- Q2: Count total orders per customer
+SELECT c.customer_name, COUNT(o.order_id) AS total_orders
+FROM customers c  
+INNER JOIN orders o ON c.customer_id = o.customer_id 
+GROUP BY c.customer_name;
+
+-- Q3: Customers who have placed more than 1 order
+SELECT c.customer_name, COUNT(o.order_id) AS total_orders
+FROM customers c
+INNER JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_name
+HAVING COUNT(o.order_id) > 1;
+
+
+-- --- B. Students & Courses (LEFT JOIN) ---
+
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    student_name VARCHAR(50),
+    city VARCHAR(50)
+);
+
+INSERT INTO students VALUES
+(1, 'Rahul', 'Mumbai'),
+(2, 'Priya', 'Pune'),
+(3, 'Amit', 'Delhi'),
+(4, 'Neha', 'Mumbai'),
+(5, 'Arjun', 'Jaipur');
+
+CREATE TABLE courses (
+    course_id INT PRIMARY KEY,
+    student_id INT,
+    course_name VARCHAR(50)
+);
+
+INSERT INTO courses VALUES
+(101, 1, 'Java'),
+(102, 2, 'Python'),
+(103, 1, 'SQL'),
+(104, 3, 'React');
+
+-- Q: Find students who are not enrolled in any course
+SELECT s.student_name
+FROM students s
+LEFT JOIN courses c ON s.student_id = c.student_id
+WHERE c.student_id IS NULL;
+
+
+-- =====================================================================
+-- 6. ADVANCED SQL (SELF JOIN, SUBQUERIES, & WINDOW FUNCTIONS)
+-- =====================================================================
+
+CREATE TABLE Employee (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    manager_id INT,
+    dept_id INT,
+    salary DECIMAL(10,2),
+    join_date DATE
+);
+
+INSERT INTO Employee (emp_id, emp_name, manager_id, dept_id, salary, join_date) VALUES
+(1, 'Amit', NULL, 10, 100000, '2020-01-10'),
+(2, 'Rahul', 1, 10, 70000, '2021-03-15'),
+(3, 'Sneha', 1, 20, 80000, '2021-05-20'),
+(4, 'Priya', 2, 10, 60000, '2022-02-10'),
+(5, 'Arjun', 2, 20, 70000, '2022-06-18'),
+(6, 'Neha', 3, 20, 80000, '2023-01-12'),
+(7, 'Rohit', 3, NULL, 50000, '2023-04-25'),
+(8, 'Priya', 2, 30, 60000, '2022-02-10'),
+(9, 'Karan', 1, 30, 90000, '2021-08-14'),
+(10, 'Simran', 9, 30, 70000, '2024-01-05');
+
+-- --- SELF JOIN ---
+-- Display each employee along with their manager name
+SELECT e.emp_name AS Employee, m.emp_name AS Manager
+FROM Employee e
+INNER JOIN Employee m ON e.manager_id = m.emp_id;
+
+-- --- SUBQUERIES & SALARY ANALYSIS ---
+-- Highest salary
+SELECT MAX(salary) AS Highest_Salary FROM Employee;
+
+-- Second highest salary
+SELECT MAX(salary) AS Second_Highest_Salary
+FROM Employee
+WHERE salary < (SELECT MAX(salary) FROM Employee);
+
+-- Employees earning more than the company average salary
+SELECT * FROM Employee
+WHERE salary > (SELECT AVG(salary) FROM Employee);
+
+-- Employees without a department
+SELECT * FROM Employee WHERE dept_id IS NULL;
+
+
+-- --- WINDOW FUNCTIONS (RANK, DENSE_RANK, ROW_NUMBER) ---
+
+-- 1. Row Number based on salary
+SELECT emp_name, salary,
+       ROW_NUMBER() OVER (ORDER BY salary DESC) AS row_num
+FROM Employee;
+
+-- 2. Difference between RANK() and DENSE_RANK()
+SELECT emp_name, salary,
+       RANK() OVER (ORDER BY salary DESC) AS rnk,
+       DENSE_RANK() OVER (ORDER BY salary DESC) AS dense_rnk
+FROM Employee;
+
+-- 3. Nth Highest Salary using DENSE_RANK (e.g., N=3)
+SELECT salary 
+FROM (
+    SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk 
+    FROM Employee
+) t 
+WHERE rnk = 3;
+
+-- 4. Highest salary per department
+SELECT dept_id, MAX(salary) AS max_salary
+FROM Employee
+GROUP BY dept_id;
+
+-- 5. Second highest salary per department (Partition By)
+SELECT salary, dept_id 
+FROM (
+    SELECT dept_id, salary, 
+           DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) AS rnk
+    FROM Employee
+) t 
+WHERE rnk = 2;
+
+
+-- =====================================================================
+-- 7. DUPLICATE HANDLING & CTES
+-- =====================================================================
+
+-- Find duplicate records by name
+SELECT emp_name, COUNT(*) 
+FROM Employee 
+GROUP BY emp_name 
+HAVING COUNT(*) > 1;
+
+-- Delete duplicate records (keeping the lowest emp_id)
+DELETE FROM Employee
+WHERE emp_id NOT IN (
+    SELECT emp_id
+    FROM (
+        SELECT MIN(emp_id) AS emp_id
+        FROM Employee
+        GROUP BY emp_name
+    ) t
+);
+
+-- Common Table Expression (CTE) example
+WITH HighEarners AS (
+    SELECT *
+    FROM Employee
+    WHERE salary > 50000
+)
+SELECT * FROM HighEarners;
