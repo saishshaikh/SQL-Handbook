@@ -105,27 +105,78 @@ WHERE employee_id = 10;
 -- =====================================================================
 
 -- Department-wise employee count
-SELECT department, COUNT(*) AS count_employee
+SELECT department, COUNT(*) AS Total_employees
 FROM employees
 GROUP BY department;
+
 
 -- Department-wise average salary
-SELECT department, AVG(salary) AS avg_salary
-FROM employees 
+SELECT department, AVG(salary) AS Avg_salary
+FROM employees
 GROUP BY department;
 
--- Departments with more than 2 employees
-SELECT department, COUNT(*) AS employee_no 
-FROM employees 
-GROUP BY department 
-HAVING COUNT(*) > 2;
 
--- Department with maximum employees using LIMIT
-SELECT department, COUNT(*) AS total_emp
+-- Departments with more than 2 employees
+SELECT department, COUNT(*) AS Total_employees
 FROM employees
 GROUP BY department
-ORDER BY total_emp DESC
+HAVING COUNT(*) > 2;
+
+
+-- Department with maximum employees
+SELECT department, COUNT(*) AS Total_employees
+FROM employees
+GROUP BY department
+ORDER BY COUNT(*) DESC
 LIMIT 1;
+
+
+-- Department-wise maximum salary
+SELECT department, MAX(salary) AS Highest_salary
+FROM employees
+GROUP BY department;
+
+
+-- Department-wise minimum salary
+SELECT department, MIN(salary) AS Min_salary
+FROM employees
+GROUP BY department;
+
+
+-- Departments with average salary greater than 50000
+SELECT department, AVG(salary) AS Avg_salary
+FROM employees
+GROUP BY department
+HAVING AVG(salary) > 50000;
+
+
+-- Department with highest average salary
+SELECT department, AVG(salary) AS Highest_avg_salary
+FROM employees
+GROUP BY department
+ORDER BY AVG(salary) DESC
+LIMIT 1;
+
+
+-- Department-wise maximum and minimum salary
+SELECT department,
+       MAX(salary) AS Highest_salary,
+       MIN(salary) AS Min_salary
+FROM employees
+GROUP BY department;
+
+
+-- Department-wise employee count, average, maximum and minimum salary
+SELECT department,
+       COUNT(*) AS Total_employees,
+       AVG(salary) AS Avg_salary,
+       MAX(salary) AS Highest_salary,
+       MIN(salary) AS Min_salary
+FROM employees
+GROUP BY department;
+```
+
+
 
 -- Using CASE Statement (Categorize employees based on salary)
 SELECT employee_name, salary,
