@@ -58,6 +58,10 @@ WHERE department IN ('IT', 'HR');
 SELECT * FROM employees 
 WHERE employee_name LIKE 'R%';
 
+'R%'   → R se START
+'%R'   → R se END
+'%R%'  → kahin bhi R
+
 -- 6. Using LIMIT (Get top 5 highest paid employees)
 SELECT * FROM employees 
 ORDER BY salary DESC 
