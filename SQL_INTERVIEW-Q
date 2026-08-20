@@ -280,6 +280,221 @@ LEFT JOIN courses c ON s.student_id = c.student_id
 WHERE c.student_id IS NULL;
 
 
+# 📝 SQL Questions & Solutions ON INNER AND LEFT JOINS FOR MORE PRACTISE
+
+## Q1. Display the name of each customer and the product they ordered.
+
+```sql
+SELECT c.customer_name, o.product
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+---
+
+## Q2. Display the names of customers who have placed at least one order. Duplicate names should not appear.
+
+```sql
+SELECT DISTINCT c.customer_name
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+---
+
+## Q3. Display each customer's name and their ordered product. Customers who have not placed any order should also be displayed.
+
+```sql
+SELECT c.customer_name, o.product
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+---
+
+## Q4. Display the names of customers who have never placed an order.
+
+```sql
+SELECT c.customer_name
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;
+```
+
+---
+
+## Q5. Display the total number of orders placed by each customer. Show 0 for customers who have not placed any order.
+
+```sql
+SELECT c.customer_name,
+       COUNT(o.order_id) AS total_orders
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.customer_name;
+```
+
+---
+
+## Q6. Display the total spending amount for each customer. Show 0 for customers who have not placed any order.
+
+```sql
+SELECT c.customer_name,
+       COALESCE(SUM(o.amount), 0) AS total_spending
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.customer_name;
+```
+
+---
+
+## Q7. Display only customers who have placed 2 or more orders.
+
+```sql
+SELECT c.customer_name,
+       COUNT(o.order_id) AS total_orders
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.customer_name
+HAVING COUNT(o.order_id) >= 2;
+```
+
+---
+
+## Q8. Display the order status for each customer.
+
+* `Ordered` → Customer has placed an order
+* `Not Ordered` → Customer has not placed an order
+
+```sql
+SELECT c.customer_name,
+       CASE
+           WHEN o.order_id IS NULL THEN 'Not Ordered'
+           ELSE 'Ordered'
+       END AS order_status
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+---
+
+## Q9. Display the customer name, ordered product, and order amount.
+
+```sql
+SELECT c.customer_name,
+       o.product,
+       o.amount
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+---
+
+## Q10. Display the names of customers who have not placed any order.
+
+```sql
+SELECT c.customer_name
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.customer_id IS NULL;
+```
+
+---
+
+## Q11. Display the names of customers who have placed an order worth more than ₹5000. Duplicate customers should not appear.
+
+```sql
+SELECT DISTINCT c.customer_name
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.amount > 5000;
+```
+
+---
+
+## Q12. Display the highest order amount for each customer. Show 0 for customers who have not placed any order.
+
+```sql
+SELECT c.customer_name,
+       COALESCE(MAX(o.amount), 0) AS highest_order
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.customer_name;
+```
+
+---
+
+## Q13. Display each customer's name, city, and order status.
+
+```sql
+SELECT c.customer_name,
+       c.city,
+       CASE
+           WHEN o.order_id IS NULL THEN 'Not Ordered'
+           ELSE 'Ordered'
+       END AS order_status
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+---
+
+## Q14. Display only customers whose total spending is less than ₹10,000.
+
+```sql
+SELECT c.customer_name,
+       SUM(o.amount) AS total_spending
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.customer_name
+HAVING SUM(o.amount) < 10000;
+```
+
+---
+
+## Q15A. Ordered Customers
+
+### Question
+
+Display the names of customers who have placed at least one order.
+
+```sql
+SELECT DISTINCT c.customer_name
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id;
+```
+
+---
+
+## Q15B. Never Ordered Customers
+
+### Question
+
+Display the names of customers who have never placed an order.
+
+```sql
+SELECT c.customer_name
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;
+```
+
+
 -- =====================================================================
 -- 6. ADVANCED SQL (SELF JOIN, SUBQUERIES, & WINDOW FUNCTIONS)
 -- =====================================================================
