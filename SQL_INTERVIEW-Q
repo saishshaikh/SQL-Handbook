@@ -529,6 +529,8 @@ SELECT
 FROM Employee e
 JOIN Employee m
     ON e.manager_id = m.emp_id;
+...
+
 Q2. Employee + Manager + salaries
 sql
 SELECT 
@@ -539,6 +541,8 @@ SELECT
 FROM Employee e
 JOIN Employee m
     ON e.manager_id = m.emp_id;
+...
+
 Q3. Only employees who have a manager
 sql
 SELECT 
@@ -549,6 +553,8 @@ JOIN Employee m
     ON e.manager_id = m.emp_id;
 Note: INNER JOIN automatically removes employees without manager (like CEO)
 
+
+...
 Q4. Employees earning more than manager ⭐
 sql
 SELECT 
@@ -562,6 +568,8 @@ JOIN Employee m
 WHERE e.salary > m.salary;
 Result: Neha (90k) > Sneha (80k), Vikas (95k) > Karan (90k)
 
+
+...
 Q5. Employees earning less than manager
 sql
 SELECT 
@@ -573,6 +581,8 @@ FROM Employee e
 JOIN Employee m
     ON e.manager_id = m.emp_id
 WHERE e.salary < m.salary;
+
+...
 Q6. Salary difference
 sql
 SELECT 
@@ -582,6 +592,8 @@ SELECT
 FROM Employee e
 JOIN Employee m
     ON e.manager_id = m.emp_id;
+
+...
 Q7. Employees who joined after their manager
 sql
 SELECT 
@@ -593,6 +605,8 @@ FROM Employee e
 JOIN Employee m
     ON e.manager_id = m.emp_id
 WHERE e.join_date > m.join_date;
+...
+
 Q8. Count of employees under each manager ⭐
 sql
 SELECT 
@@ -602,6 +616,8 @@ FROM Employee m
 JOIN Employee e
     ON m.emp_id = e.manager_id
 GROUP BY m.emp_name;
+
+...
 Q9. Managers with 2+ employees ⭐
 sql
 SELECT 
@@ -612,6 +628,8 @@ JOIN Employee e
     ON m.emp_id = e.manager_id
 GROUP BY m.emp_name
 HAVING COUNT(e.emp_id) >= 2;
+...
+
 Q10. Employee → Manager → Senior Manager ⭐⭐⭐
 sql
 SELECT 
@@ -622,6 +640,8 @@ FROM Employee e
 LEFT JOIN Employee m
     ON e.manager_id = m.emp_id
 LEFT JOIN Employee mm
+
+
 
 -- --- SUBQUERIES & SALARY ANALYSIS ---
 -- Highest salary
