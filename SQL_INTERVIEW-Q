@@ -521,10 +521,107 @@ INSERT INTO Employee (emp_id, emp_name, manager_id, dept_id, salary, join_date) 
 (10, 'Simran', 9, 30, 70000, '2024-01-05');
 
 -- --- SELF JOIN ---
--- Display each employee along with their manager name
-SELECT e.emp_name AS Employee, m.emp_name AS Manager
+Q1. Employee + Manager name
+sql
+SELECT 
+    e.emp_name AS Employee,
+    m.emp_name AS Manager
 FROM Employee e
-INNER JOIN Employee m ON e.manager_id = m.emp_id;
+JOIN Employee m
+    ON e.manager_id = m.emp_id;
+Q2. Employee + Manager + salaries
+sql
+SELECT 
+    e.emp_name AS Employee,
+    e.salary AS Employee_Salary,
+    m.emp_name AS Manager,
+    m.salary AS Manager_Salary
+FROM Employee e
+JOIN Employee m
+    ON e.manager_id = m.emp_id;
+Q3. Only employees who have a manager
+sql
+SELECT 
+    e.emp_name AS Employee,
+    m.emp_name AS Manager
+FROM Employee e
+JOIN Employee m
+    ON e.manager_id = m.emp_id;
+Note: INNER JOIN automatically removes employees without manager (like CEO)
+
+Q4. Employees earning more than manager ⭐
+sql
+SELECT 
+    e.emp_name AS Employee,
+    e.salary AS Employee_Salary,
+    m.emp_name AS Manager,
+    m.salary AS Manager_Salary
+FROM Employee e
+JOIN Employee m
+    ON e.manager_id = m.emp_id
+WHERE e.salary > m.salary;
+Result: Neha (90k) > Sneha (80k), Vikas (95k) > Karan (90k)
+
+Q5. Employees earning less than manager
+sql
+SELECT 
+    e.emp_name AS Employee,
+    e.salary AS Employee_Salary,
+    m.emp_name AS Manager,
+    m.salary AS Manager_Salary
+FROM Employee e
+JOIN Employee m
+    ON e.manager_id = m.emp_id
+WHERE e.salary < m.salary;
+Q6. Salary difference
+sql
+SELECT 
+    e.emp_name AS Employee,
+    m.emp_name AS Manager,
+    e.salary - m.salary AS Salary_Difference
+FROM Employee e
+JOIN Employee m
+    ON e.manager_id = m.emp_id;
+Q7. Employees who joined after their manager
+sql
+SELECT 
+    e.emp_name AS Employee,
+    e.join_date AS Employee_Join_Date,
+    m.emp_name AS Manager,
+    m.join_date AS Manager_Join_Date
+FROM Employee e
+JOIN Employee m
+    ON e.manager_id = m.emp_id
+WHERE e.join_date > m.join_date;
+Q8. Count of employees under each manager ⭐
+sql
+SELECT 
+    m.emp_name AS Manager,
+    COUNT(e.emp_id) AS Employee_Count
+FROM Employee m
+JOIN Employee e
+    ON m.emp_id = e.manager_id
+GROUP BY m.emp_name;
+Q9. Managers with 2+ employees ⭐
+sql
+SELECT 
+    m.emp_name AS Manager,
+    COUNT(e.emp_id) AS Employee_Count
+FROM Employee m
+JOIN Employee e
+    ON m.emp_id = e.manager_id
+GROUP BY m.emp_name
+HAVING COUNT(e.emp_id) >= 2;
+Q10. Employee → Manager → Senior Manager ⭐⭐⭐
+sql
+SELECT 
+    e.emp_name AS Employee,
+    m.emp_name AS Manager,
+    mm.emp_name AS Senior_Manager
+FROM Employee e
+LEFT JOIN Employee m
+    ON e.manager_id = m.emp_id
+LEFT JOIN Employee mm
 
 -- --- SUBQUERIES & SALARY ANALYSIS ---
 -- Highest salary
